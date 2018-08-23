@@ -33,7 +33,7 @@ type BucketInput struct {
 
 //DeployAction interface to define deploy action
 type DeployAction interface {
-	Deploy(bucketInput *BucketInput, appDir string) error
+	Deploy(dnsInput *DNSInput, bucketInput *BucketInput, appDir string) error
 }
 
 //Deploy is a command to deploy the UI
@@ -45,12 +45,17 @@ func Deploy(action DeployAction) cli.Command {
 		Usage:   "Deploy ui application",
 		Flags:   flags.Deploy(),
 		Action: func(c *cli.Context) error {
+			dnsInput := DNSInput{
+				HostedZone:       c.String(hostedZone),
+				HostedZoneExists: c.String(hostedZoneExistsArg),
+				Environment:      c.String(environment),
+			}
 			bucketinput := BucketInput{
 				HostedZone:     c.String(hostedZone),
 				FullDomainName: c.String(domainName),
 				CacheValueTTL:  c.String(cacheTTLArg),
 			}
-			return action.Deploy(&bucketinput, c.String(appDir))
+			return action.Deploy(&dnsInput, &bucketinput, c.String(appDir))
 		},
 	}
 }

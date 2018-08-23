@@ -33,6 +33,7 @@
     "private/protocol/rest",
     "private/protocol/restxml",
     "private/protocol/xml/xmlutil",
+    "service/cloudformation",
     "service/s3",
     "service/s3/s3iface",
     "service/sts"
@@ -66,6 +67,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2b4f44198123dd03446ce20c9bb642d989b6fb06317cd753e9bb9148088bfb17"
+  inputs-digest = "47126e055ab270298654cf2f705cbf8ebdf27eda7dfbc33636c9f0367df7e6fc"
   solver-name = "gps-cdcl"
   solver-version = 1

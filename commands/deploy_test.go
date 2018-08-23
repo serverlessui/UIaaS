@@ -10,7 +10,7 @@ import (
 type mockDeployAction struct {
 }
 
-func (mock mockDeployAction) Deploy(bucketInput *BucketInput, appDir string) error {
+func (mock mockDeployAction) Deploy(dnsInput *DNSInput, bucketInput *BucketInput, appDir string) error {
 	return nil
 }
 
