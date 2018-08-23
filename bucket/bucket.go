@@ -2,6 +2,7 @@ package bucket
 
 import (
 	"log"
+	"os"
 	"strings"
 
 	"github.com/aws/aws-sdk-go/service/cloudformation"
@@ -30,12 +31,12 @@ func (s3Bucket S3Bucket) DeploySite(input *commands.BucketInput) (*cloudformatio
 
 	if resourceNotFound {
 		s3Bucket.Stack.CreateBucket(input)
+		log.Println("Cloudfront distribution creation begun. This may take up to 30 minutes...")
+		os.Exit(0)
 	} else {
 		log.Println("DNS Stack already exists")
-		return stack, nil
 	}
-
-	return s3Bucket.Stack.WaitForStackCreation(stackName)
+	return stack, nil
 
 }
 

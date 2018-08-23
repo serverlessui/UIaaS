@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/aws/aws-sdk-go/service/cloudformation"
 	"github.com/serverlessui/UIaaS/commands"
@@ -64,7 +65,9 @@ func (cf CloudformationStack) WaitForStackCreation(stackName string) (*cloudform
 		if *stack.StackStatus == createComplete {
 			return stack, nil
 		}
-		log.Println("Stack status ", stack.StackStatus, "...")
+		log.Println("Stack status ", *stack.StackStatus, "...")
+		time.Sleep(4 * time.Second)
+
 	}
 }
 
