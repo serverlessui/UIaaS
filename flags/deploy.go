@@ -10,6 +10,7 @@ const (
 	tag              = "tag, t"
 	environment      = "environment, env"
 	appdir           = "applicationdirectory, dir"
+	clientSiteName   = "clientsitename, csn"
 )
 
 //Deploy method to return flags for deployment
@@ -42,6 +43,10 @@ func Deploy() []cli.Flag {
 		cli.StringFlag{
 			Name:  appdir,
 			Usage: "`applicationdirectory` Directory containing ui source code",
+		},
+		cli.StringFlag{
+			Name:  clientSiteName,
+			Usage: "`clientsitename` Name of client site",
 		},
 	}
 }

@@ -2,7 +2,6 @@ package bucket
 
 import (
 	"log"
-	"os"
 	"strings"
 
 	"github.com/aws/aws-sdk-go/service/cloudformation"
@@ -23,16 +22,15 @@ type S3Bucket struct {
 	Stack stacks.Stack
 }
 
-//DeploySite is a function to Create an S3 Site with CDN and ACM
-func (s3Bucket S3Bucket) DeploySite(input *commands.BucketInput) (*cloudformation.Stack, error) {
+//DeployCDN is a function to Create an S3 Site with CDN and ACM
+func (s3Bucket S3Bucket) DeployCDN(input *commands.BucketInput) (*cloudformation.Stack, error) {
 	stackName := getStackName(input)
 	stack, err := s3Bucket.Stack.Get(stackName)
 	_, resourceNotFound := err.(stacks.NotFoundError)
 
 	if resourceNotFound {
-		s3Bucket.Stack.CreateBucket(input)
+		s3Bucket.Stack.CreateBucket(input, stackName)
 		log.Println("Cloudfront distribution creation begun. This may take up to 30 minutes...")
-		os.Exit(0)
 	} else {
 		log.Println("DNS Stack already exists")
 	}
@@ -43,5 +41,5 @@ func (s3Bucket S3Bucket) DeploySite(input *commands.BucketInput) (*cloudformatio
 //Method to convert DomainName from input to stack name
 //route53 does not allow for full stop (.) characters
 func getStackName(input *commands.BucketInput) string {
-	return strings.Replace(input.FullDomainName, ".", "-", -1)
+	return strings.Replace(input.FullDomainName, ".", "-", -1) + "-cdn"
 }

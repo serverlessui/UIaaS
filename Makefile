@@ -26,7 +26,8 @@ test-min:
 
 clean:
 	rm -rf vendor
-	
+	rm -rf release/serverlessui-*
+	rm -rf build
 
 publish-release:
 	@go get github.com/aktau/github-release

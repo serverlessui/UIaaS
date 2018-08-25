@@ -22,8 +22,8 @@ const (
 //Stack interface to define interacting with infra stacks
 type Stack interface {
 	Get(stackName string) (*cloudformation.Stack, error)
-	CreateBucket(bucketInput *commands.BucketInput) error
-	CreateDNS(dnsInput *commands.DNSInput) error
+	CreateBucket(bucketInput *commands.BucketInput, stackName string) error
+	CreateDNS(dnsInput *commands.DNSInput, stackName string) error
 	WaitForStackCreation(stackName string) (*cloudformation.Stack, error)
 }
 
@@ -45,13 +45,15 @@ func (e NotFoundError) Error() string {
 }
 
 //CreateDNS method to create DNS record
-func (cf CloudformationStack) CreateDNS(dnsInput *commands.DNSInput) error {
-	log.Println("DEBUG: created url ", cf.CreateDNSURL)
+func (cf CloudformationStack) CreateDNS(dnsInput *commands.DNSInput, stackName string) error {
+	url := strings.Replace(cf.CreateDNSURL, ":name", stackName, -1)
+
+	log.Println("DEBUG: created url ", url)
 	out, err := json.Marshal(dnsInput)
 	if err != nil {
 		return err
 	}
-	return post(out, cf.CreateDNSURL, cf.Client)
+	return post(out, url, cf.Client)
 
 }
 
@@ -59,8 +61,9 @@ func (cf CloudformationStack) CreateDNS(dnsInput *commands.DNSInput) error {
 func (cf CloudformationStack) WaitForStackCreation(stackName string) (*cloudformation.Stack, error) {
 	for {
 		stack, err := cf.Get(stackName)
+
 		if err != nil {
-			return nil, err
+			return &cloudformation.Stack{}, err
 		}
 		if *stack.StackStatus == createComplete {
 			return stack, nil
@@ -72,13 +75,15 @@ func (cf CloudformationStack) WaitForStackCreation(stackName string) (*cloudform
 }
 
 //CreateBucket method to create Bucket
-func (cf CloudformationStack) CreateBucket(bucketInput *commands.BucketInput) error {
-	log.Println("DEBUG: created url ", cf.CreateBucketURL)
+func (cf CloudformationStack) CreateBucket(bucketInput *commands.BucketInput, stackName string) error {
+	url := strings.Replace(cf.CreateBucketURL, ":name", stackName, -1)
+	log.Println("DEBUG: created url ", url)
+
 	out, err := json.Marshal(bucketInput)
 	if err != nil {
 		return err
 	}
-	return post(out, cf.CreateBucketURL, cf.Client)
+	return post(out, url, cf.Client)
 
 }
 
@@ -86,7 +91,7 @@ func (cf CloudformationStack) CreateBucket(bucketInput *commands.BucketInput) er
 func (cf CloudformationStack) Get(stackName string) (*cloudformation.Stack, error) {
 	url := strings.Replace(cf.URL, ":name", stackName, -1)
 
-	log.Println("DEBUG: about to send request to url ", cf.URL)
+	log.Println("DEBUG: about to send request to url ", url)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	req.Header.Set("Content-Type", "application/json")
 
@@ -134,6 +139,7 @@ func post(out []byte, url string, client *http.Client) error {
 
 	resp, err := client.Do(req)
 	if err != nil {
+		log.Println("Error making http call ", err)
 		return err
 	}
 	if !is2xx(&resp.StatusCode) {

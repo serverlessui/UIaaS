@@ -14,28 +14,28 @@ import (
 type mockBucket struct {
 }
 
-func (mock mockBucket) DeploySite(input *commands.BucketInput) (*cloudformation.Stack, error) {
+func (mock mockBucket) DeployCDN(input *commands.BucketInput) (*cloudformation.Stack, error) {
 	return nil, nil
 }
 
 type mockBadBucket struct {
 }
 
-func (mock mockBadBucket) DeploySite(input *commands.BucketInput) (*cloudformation.Stack, error) {
+func (mock mockBadBucket) DeployCDN(input *commands.BucketInput) (*cloudformation.Stack, error) {
 	return nil, errors.New("")
 }
 
 type mockDNS struct {
 }
 
-func (mock mockDNS) DeployHostedZone(input *commands.DNSInput) (*dns.Route53Output, error) {
-	return &dns.Route53Output{WebsiteArn: "SOMEARN"}, nil
+func (mock mockDNS) DeploySite(input *commands.DNSInput) (*dns.Route53Output, error) {
+	return &dns.Route53Output{WebsiteArn: "SOMEARN", WebsiteURL: "SOMEURL"}, nil
 }
 
 type mockBadDNS struct {
 }
 
-func (mock mockBadDNS) DeployHostedZone(input *commands.DNSInput) (*dns.Route53Output, error) {
+func (mock mockBadDNS) DeploySite(input *commands.DNSInput) (*dns.Route53Output, error) {
 	return nil, errors.New("")
 }
 

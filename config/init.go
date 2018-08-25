@@ -19,8 +19,8 @@ import (
 
 const (
 	url             = "https://6456l3jgrl.execute-api.us-east-1.amazonaws.com/dev/stacks/:name"
-	createBucketURL = "https://6456l3jgrl.execute-api.us-east-1.amazonaws.com/dev/buckets"
-	createDNSURL    = "https://6456l3jgrl.execute-api.us-east-1.amazonaws.com/dev/hostedzones"
+	createBucketURL = "https://6456l3jgrl.execute-api.us-east-1.amazonaws.com/dev/sites/:name/cdns"
+	createDNSURL    = "https://6456l3jgrl.execute-api.us-east-1.amazonaws.com/dev/sites/:name"
 )
 
 //CreateApp method to create initial app

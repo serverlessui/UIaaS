@@ -2,6 +2,7 @@ package dns
 
 import (
 	"log"
+	"os"
 	"strings"
 
 	"github.com/aws/aws-sdk-go/service/cloudformation"
@@ -12,6 +13,7 @@ import (
 
 const (
 	websiteArnOutput = "WebsiteCertArn"
+	websiteURL       = "WebsiteURL"
 )
 
 //Route53 is an implementation of the DNS interface
@@ -22,31 +24,40 @@ type Route53 struct {
 //Route53Output struct containing output from Route53
 type Route53Output struct {
 	WebsiteArn string
+	WebsiteURL string
 }
 
-//DeployHostedZone Method to create Route53 hosted zone
-func (route53 Route53) DeployHostedZone(input *commands.DNSInput) (*Route53Output, error) {
+//DeploySite Method to create Route53 hosted zone
+func (route53 Route53) DeploySite(input *commands.DNSInput) (*Route53Output, error) {
 	//replace domain name
 	stackName := getStackName(input)
+
 	stack, err := route53.Stack.Get(stackName)
 	_, resourceNotFound := err.(stacks.NotFoundError)
-	websiteOutputValue := input.Environment + "-" + websiteArnOutput
+	websiteOutputValue := input.Environment + "-" + input.ClientSiteName + "-" + websiteArnOutput
+	websiteURL := input.Environment + "-" + input.ClientSiteName + "-" + websiteURL
 
 	if resourceNotFound {
-		route53.Stack.CreateDNS(input)
+		route53.Stack.CreateDNS(input, stackName)
 	} else {
 		log.Println("DNS Stack already exists")
-		return &Route53Output{WebsiteArn: getOutputValue(stack, websiteOutputValue)}, nil
+		return &Route53Output{WebsiteArn: getOutputValue(stack, websiteOutputValue),
+			WebsiteURL: getOutputValue(stack, websiteURL)}, nil
 	}
 	stack, err = route53.Stack.WaitForStackCreation(stackName)
-
-	return &Route53Output{WebsiteArn: getOutputValue(stack, websiteOutputValue)}, nil
+	if err != nil {
+		log.Printf("Failed to create Site")
+		os.Exit(1)
+	}
+	log.Println("STACK ", stack)
+	return &Route53Output{WebsiteArn: getOutputValue(stack, websiteOutputValue),
+		WebsiteURL: getOutputValue(stack, websiteURL)}, nil
 }
 
 //Method to convert DomainName from input to stack name
 //route53 does not allow for full stop (.) characters
 func getStackName(input *commands.DNSInput) string {
-	return strings.Replace(input.HostedZone, ".", "-", -1)
+	return strings.Replace(input.FullDomainName, ".", "-", -1)
 }
 
 //getOutputValue method will retrieve an output value from Output array

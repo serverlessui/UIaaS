@@ -7,6 +7,7 @@ import (
 
 const (
 	hostedZone          = "hostedzone"
+	clientSiteName      = "clientsitename"
 	domainName          = "domainname"
 	cacheTTLArg         = "cachettl"
 	hostedZoneExistsArg = "hostedzoneexists"
@@ -21,6 +22,8 @@ type DNSInput struct {
 	//todo- add type safety
 	HostedZoneExists string
 	Environment      string
+	FullDomainName   string
+	ClientSiteName   string
 }
 
 //BucketInput is a struct which deines the required parameters to create an s3 bucket based site
@@ -29,6 +32,7 @@ type BucketInput struct {
 	FullDomainName    string
 	AcmCertificateArn string
 	CacheValueTTL     string
+	WebsiteURL        string
 }
 
 //DeployAction interface to define deploy action
@@ -49,6 +53,8 @@ func Deploy(action DeployAction) cli.Command {
 				HostedZone:       c.String(hostedZone),
 				HostedZoneExists: c.String(hostedZoneExistsArg),
 				Environment:      c.String(environment),
+				ClientSiteName:   c.String(clientSiteName),
+				FullDomainName:   c.String(domainName),
 			}
 			bucketinput := BucketInput{
 				HostedZone:     c.String(hostedZone),
